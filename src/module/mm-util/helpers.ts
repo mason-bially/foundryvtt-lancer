@@ -14,26 +14,30 @@ export class FetcherCache<A, T> {
   // Holds the expiration time of specified keys. Repeated access will keep alive for longer
   private timeout_map: Map<A, number> = new Map();
 
-  constructor(private readonly timeout: number | null, private readonly fetch_func: (arg: A) => Promise<T>) {}
+  constructor(private readonly timeout: number | null) {}
 
-  // Fetch the value using the specified arg
-  async fetch(arg: A): Promise<T> {
+  // Call this on a key to check if it has timed out
+  private refresh_timeout(key: A) {
+    if (this.timeout) {
+      let now = Date.now();
+      this.timeout_map.set(key, now + this.timeout);
+    }
+  }
+
+  // Fetch the value using the specified key. If not present, resolves it using the specified function
+  async fetch(arg: A, fetch_func: (arg: A) => Promise<T>): Promise<T> {
     let now = Date.now();
 
     // Refresh the lookup on our target value (or set it for the first time, depending) ((if we have a timeout))
-    if (this.timeout) {
-      this.timeout_map.set(arg, now + this.timeout);
-
-      // Pre-emptively cleanup
-      this.cleanup();
-    }
+    this.refresh_timeout(arg);
+    this.cleanup();
 
     // Check if we have cached data. If so, yield. If not, create
     let cached = this.cached_values.get(arg);
     if (cached) {
       return cached;
     } else {
-      let new_val_promise = this.fetch_func(arg);
+      let new_val_promise = fetch_func(arg);
       this.cached_values.set(arg, new_val_promise);
       new_val_promise.then(resolved => this.cached_resolved_values.set(arg, resolved));
       return new_val_promise;
@@ -42,11 +46,16 @@ export class FetcherCache<A, T> {
 
   // Fetch the value iff it is currently cached. Essentially a no-cost peek, useful for editing the cached val without doing a full re-fetch
   soft_fetch(arg: A): T | null {
-    return this.cached_resolved_values.get(arg) ?? null;
+    let rv = this.cached_resolved_values.get(arg) ?? null;
+    if(rv != null) {
+      this.refresh_timeout(arg); 
+    }
+    return rv;
   }
 
   // Destroys all entries that should be destroyed
   private cleanup() {
+    if(!this.timeout) return;
     let now = Date.now();
     for (let [arg, expire] of this.timeout_map.entries()) {
       if (expire < now) {
@@ -143,7 +152,7 @@ export async function mm_wrap_item<T extends EntryType & LancerItemType>(
   let cat = reg.get_cat(item.data.type) as FoundryRegCat<T>;
   let ent = (await cat.dangerous_wrap_doc(ctx, item as any)) as LiveEntryTypes<T>; // Poor typescript doesn't know how to handle these
   if (!ent) {
-    throw new Error("Something went wrong while trying to contextualize an item...");
+    throw new Error("Something went wrong while trying to wrap an item...");
   }
   return ent;
 }
@@ -241,7 +250,7 @@ const world_and_comp_license_cache = new FetcherCache<string, License | null>(
   60_000,
   async license_name => {
     let ctx = new OpCtx();
-    let world_reg = new FoundryReg("game"); // Actor src doesn't matter at all
+    let world_reg = new FoundryReg("game");
     let world_license = await world_reg.get_cat(EntryType.LICENSE).lookup_live(ctx, {key: license_name});
     if (world_license.length) {
       return world_license[0];

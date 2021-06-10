@@ -566,13 +566,18 @@ export class LancerActorSheet<T extends LancerActorType> extends ActorSheet {
 
     // Resolve the drop and delegate to children
     let raw_drop_data = event.dataTransfer.getData("text/plain") ?? "";
+
     let native_drop = await resolve_native_drop(raw_drop_data);
 
     // Pre-process any drops
     // Max out uses
-    if(native_drop?.type == "Item" && native_drop.entity.data.data.derived.mm && is_tagged(native_drop.entity.data.data.derived.mm) && is_limited(native_drop.entity.data.data.derived.mm))
-      //@ts-ignore Since we're limited we have uses
-      native_drop.entity.data.data.uses = native_drop.entity.data.data.derived.max_uses;
+    if(native_drop?.type == "Item") {
+      let mm = await native_drop.entity.data.data.derived.mm_promise;
+      if(is_tagged(mm) && is_limited(mm)) {
+        //@ts-ignore Since we're limited we have uses. TODO: This is dumb, shouldnt edit this directly
+        native_drop.entity.data.data.uses = native_drop.entity.data.data.derived.max_uses;
+      }
+    }
     return native_drop;
   }
 
