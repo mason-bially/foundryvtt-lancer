@@ -9,10 +9,8 @@ import { LancerItem } from "../../item/lancer-item";
 import Invisibility from "./invisibility";
 import Spotter from "./spotter";
 import { LancerToken } from "../../token";
+import { LancerActiveEffect } from "../../active-effect";
 
-export function findEffect(actor: LancerActor, effect: string): ActiveEffect | null {
-  return actor.data.effects.find(eff => eff.data.flags.core?.statusId?.endsWith(effect) ?? false) ?? null;
-}
 
 export enum Cover {
   None = 0,
@@ -66,7 +64,7 @@ export class AccDiffWeapon {
   }
 
   get impaired(): ActiveEffect | null {
-    return (this.#data?.lancerActor && findEffect(this.#data.lancerActor, "impaired")) ?? null;
+    return (this.#data?.lancerActor && this.#data.lancerActor.findEffect("impaired")) ?? null;
   }
 
   total(cover: number) {
@@ -214,12 +212,12 @@ export class AccDiffTarget {
     }
   }
 
-  get usingLockOn(): null | ActiveEffect {
+  get usingLockOn(): null | LancerActiveEffect {
     return (this.consumeLockOn && this.lockOnAvailable) || null;
   }
 
-  get lockOnAvailable(): null | ActiveEffect {
-    return findEffect(this.target.actor!, "lockon");
+  get lockOnAvailable(): null | LancerActiveEffect {
+    return this.target.actor!.findEffect("lockon");
   }
 
   get total() {

@@ -20,6 +20,7 @@ import {
   WELCOME,
   NEEDS_AUTOMATION_MIGRATION_VERSION,
 } from "./module/config";
+import { LancerActiveEffect } from "./module/active-effect";
 import { LancerActor } from "./module/actor/lancer-actor";
 import { LancerItem } from "./module/item/lancer-item";
 import { populatePilotCache } from "./module/compcon";
@@ -184,6 +185,7 @@ Hooks.once("init", async function () {
     entities: {
       LancerActor,
       LancerItem,
+      LancerActiveEffect,
     },
     canvas: {
       WeaponRangeTemplate,
@@ -223,6 +225,7 @@ Hooks.once("init", async function () {
   };
 
   // Record Configuration Values
+  CONFIG.ActiveEffect.documentClass = LancerActiveEffect;
   CONFIG.Actor.documentClass = LancerActor;
   CONFIG.Item.documentClass = LancerItem;
   CONFIG.Token.documentClass = LancerTokenDocument;
@@ -697,6 +700,9 @@ Hooks.on("renderChatMessage", async (cm: ChatMessage, html: any, data: any) => {
     }
     checkTarget(ev.target as HTMLElement) || checkTarget(ev.currentTarget as HTMLElement);
   });
+
+  // TODO unhide game master specific helper elements
+  // see: https://github.com/Moerill/fvtt-mars-5e/blob/master/js/chat/message.js
 });
 
 Hooks.on("hotbarDrop", (_bar: any, data: any, slot: number) => {

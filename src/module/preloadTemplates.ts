@@ -1,6 +1,8 @@
 export const preloadTemplates = async function () {
   const templatePaths = [
     `systems/${game.system.id}/templates/actor/pilot.hbs`,
+    `systems/${game.system.id}/templates/actor/mech.hbs`,
+    `systems/${game.system.id}/templates/actor/parts/active-effects.hbs`,
     `systems/${game.system.id}/templates/actor/npc.hbs`,
     `systems/${game.system.id}/templates/actor/deployable.hbs`,
     `systems/${game.system.id}/templates/chat/attack-card.hbs`,

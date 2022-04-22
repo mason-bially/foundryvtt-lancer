@@ -48,6 +48,7 @@ import type { ActionType } from "../action";
 import { InventoryDialog } from "../apps/inventory";
 import { HANDLER_activate_item_context_menus, HANDLER_activate_edit_counter } from "../helpers/item";
 import { number } from "fp-ts";
+import { LancerActiveEffect } from "../active-effect";
 const lp = LANCER.log_prefix;
 
 /**
@@ -568,6 +569,8 @@ export class LancerActorSheet<T extends LancerActorType> extends ActorSheet<
    */
   async getData(): Promise<LancerActorSheetData<T>> {
     const data = await super.getData(); // Not fully populated yet!
+
+    data.effects = LancerActiveEffect.prepareActiveEffectCategories(this.actor.effects.contents) as any;
 
     // Drag up the mm context (when ready) to a top level entry in the sheet data
     // @ts-ignore T doesn't narrow this.actor.data

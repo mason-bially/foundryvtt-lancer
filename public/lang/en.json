@@ -3,6 +3,11 @@
         "placeholder": {
             "name": "Name"
         },
+        "sheet-parts": {
+            "active-effects": {
+                "label": "EFFECTS"
+            }
+        },
         "deployable-sheet": {
             "tabs": {
                 "status": "<STATUS>",
@@ -96,6 +101,7 @@
                 "damage":  "// DAMAGE //",
                 "crit-damage": "// CRIT DAMAGE //",
                 "defense-hit": "// HIT VS {defense}",
+                "diff-effect": "// {kind} CHANGE //",
                 "e-defense-hit": "// HIT VS E-DEF",
                 "effect": "// EFFECT //",
                 "on-attack": "// ON ATTACK //",

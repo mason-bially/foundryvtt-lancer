@@ -36,7 +36,7 @@ import type { ActionData } from "../action";
 import { frameToPath } from "./retrograde-map";
 import { NpcClass } from "machine-mind";
 import { getAutomationOptions } from "../settings";
-import { findEffect } from "../helpers/acc_diff";
+import { LancerActiveEffect } from "../active-effect";
 const lp = LANCER.log_prefix;
 
 // Use for HP, etc
@@ -398,7 +398,9 @@ export class LancerActor extends Actor {
   async full_repair() {
     let ent = await this.data.data.derived.mm_promise;
 
-    await this.remove_all_active_effects();
+    let temporary_effects = this.effects.filter(e => !e.isPermanent && e.id != null).map(e => e.id!);
+    await this.deleteEmbeddedDocuments("ActiveEffect", temporary_effects);
+
     ent.CurrentHP = ent.MaxHP;
     ent.Burn = 0;
     ent.Overshield = 0;
@@ -536,41 +538,8 @@ export class LancerActor extends Actor {
     );
   }
 
-  /**
-   * Locates an ActiveEffect on the Actor by name and removes it if present.
-   * @param effect String name of the ActiveEffect to remove.
-   */
-  async remove_active_effect(effect: string) {
-    const target_effect = findEffect(this, effect);
-    target_effect?.delete();
-  }
-
-  /**
-   * Wipes all ActiveEffects from the Actor.
-   */
-  async remove_all_active_effects() {
-    let effects_to_delete = this.effects
-      .filter(e => e.sourceName === "None")
-      .map(e => {
-        return e.id ?? "";
-      });
-    await this.deleteEmbeddedDocuments("ActiveEffect", effects_to_delete);
-  }
-
-  /**
-   * Wipes all ActiveEffects that aren't NPC tiers from the Actor.
-   * May be subject to updates to protect additional ActiveEffects.
-   */
-  async remove_nontier_active_effects() {
-    let npc_tier_exp = /npc_tier_(\d)$/;
-    let effects_to_delete = this.effects
-      .filter(e => {
-        return e.sourceName === "None" && !npc_tier_exp.test(e.data.flags.core?.statusId ?? "");
-      })
-      .map(e => {
-        return e.id ?? "";
-      });
-    await this.deleteEmbeddedDocuments("ActiveEffect", effects_to_delete);
+  findEffect(effect: string): LancerActiveEffect | null {
+    return this.effects.find(eff => eff.statusId == effect) ?? null
   }
 
   /**
@@ -593,7 +562,7 @@ export class LancerActor extends Actor {
       return_text = return_text.concat("Mech is cooling itself. @Compendium[world.status.EXPOSED] cleared.<br>");
       ent.CurrentHeat = 0;
       await ent.writeback();
-      this.remove_active_effect("exposed");
+      this.findEffect("exposed")?.delete();
     } else if (o1 === StabOptions1.Repair) {
       if (is_reg_mech(ent) && ent.CurrentRepairs === 0) {
         return "Mech has decided to repair, but doesn't have any repair left. Please try again.<br>";

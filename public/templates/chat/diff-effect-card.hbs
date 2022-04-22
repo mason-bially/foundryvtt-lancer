@@ -1,0 +1,24 @@
+<div class="card clipped-bot">
+  <div class="lancer-header">{{localize "lancer.chat-card.title.diff-effect" check=title}}</div>
+    <div class="lancer-hit">
+      <div>
+        <img class="lancer-hit-thumb" src="{{token.img}}" />
+      </div>
+      <div class="lancer-hit-text">
+        <span class="lancer-hit-text-name">{{token.name}}</span>
+        <span class="card clipped lancer-hit-chip miss">{{status_name}}</span>
+      </div>
+    </div>
+
+
+    {{#if effect}}
+      <header>{{localize "lancer.chat-card.title.effect"}}</header>
+      {{{ effect }}}
+    {{/if}}
+    <!-- TODO status Icon <i class="fas fa-dice-d20"></i> -->
+    {{#if request}} <!--TODO if gamemaster-->
+      <button class="chat-button" data-cmds="apply">Apply</button>
+      <button class="chat-button" data-cmds="apply display">And Display</button>
+    {{/if}}
+</div>
+

@@ -3,7 +3,7 @@ import { LANCER } from "../config";
 import { getAutomationOptions } from "../settings";
 import type { LancerItem } from "../item/lancer-item";
 import type { LancerActor } from "../actor/lancer-actor";
-import { is_reg_mech, is_reg_npc } from "../actor/lancer-actor";
+import type { LancerActiveEffect } from "../active-effect";
 import type { LancerAttackMacroData, LancerMacroData } from "../interfaces";
 import {
   DamageType,
@@ -16,6 +16,7 @@ import {
   PilotWeapon,
   RegRef,
 } from "machine-mind";
+import { is_reg_mech, is_reg_npc } from "../actor/lancer-actor";
 import { is_limited, is_overkill } from "machine-mind/dist/funcs";
 import { is_loading, is_self_heat } from "machine-mind/dist/classes/mech/EquipUtil";
 import { FoundryReg } from "../mm-util/foundry-reg";
@@ -48,7 +49,7 @@ type AttackRolls = {
   targeted: {
     target: Token;
     roll: string;
-    usedLockOn: { delete: () => void } | null;
+    usedLockOn: LancerActiveEffect | null;
   }[];
 };
 
@@ -384,7 +385,7 @@ export async function checkTargets(
         const attack_tt = await attack_roll.getTooltip();
 
         if (targetingData.usedLockOn) {
-          targetingData.usedLockOn.delete();
+          targetingData.usedLockOn.macroRemove()
         }
 
         return {
