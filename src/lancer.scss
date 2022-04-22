@@ -349,6 +349,10 @@ $theme-types: "primary" "secondary" "dark-gray" "light-gray" "tooltip"    // Gen
     padding: 5px 10px;
   }
 
+  & .message-content .card {
+  margin: 0px;
+}
+
   & .message.whisper {
     border: 2px solid #fdcb28;
   }
