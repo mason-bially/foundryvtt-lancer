@@ -6,8 +6,11 @@
       <i class="fas fa-dice-d20 i--m i--light"></i>
     </a>
   </div>
+  {{!------ ITEM ------}}
+  {{> "systems/lancer/templates/chat/parts/weapon-card.hbs"}}
+  {{!------ BODY ------}}
   <div class="card clipped">
-    <div class="lancer-mini-header collapse-trigger" data-collapse-id="{{_uuid}}-attacks">{{localize "lancer.chat-card.title.attack"}}</div>
+    <div class="lancer-mini-header collapse-trigger" data-collapse-id="{{_uuid}}-attacks">{{localize "lancer.chat-card.title.defense-hit" defense=defense}}</div>
     <div class="collapse" data-collapse-id="{{_uuid}}-attacks">
       {{#each attack_results as |attack key|}}
         {{{lancer-dice-roll attack.roll attack.tt "cci cci-reticule i--m i--dark"}}}

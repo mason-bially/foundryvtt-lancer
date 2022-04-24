@@ -45,6 +45,9 @@ import * as slidingHUD from "./module/helpers/slidinghud";
 // Import Machine Mind and helpers
 import * as macros from "./module/macros";
 
+// Import chat overrides
+import * as chat from "./module/chat";
+
 // Import Tippy.js
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css"; // optional for styling

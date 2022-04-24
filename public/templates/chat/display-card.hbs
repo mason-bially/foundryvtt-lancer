@@ -1,0 +1,24 @@
+<div class="card chat-root-card">
+  <div class="lancer-header">
+    {{localize "lancer.chat-card.title.display"}}
+    //
+    {{localize ("lancer.chat-card.title." + type)}}
+  </div>
+  {{!------ BODY ------}}
+  <div class="dice-roll lancer-dice-roll">
+    <div class="dice-result">
+      <div class="dice-formula lancer-dice-formula flexrow">
+        <span style="text-align: left; margin-left: 5px;">{{ roll.formula }}</span>
+        <span class="dice-total lancer-dice-total major">{{ roll.total }}</span>
+      </div>
+      <div style="text-align: left;">
+        {{{ roll_tooltip }}}
+      </div>
+    </div>
+  </div>
+  {{#if effect}}
+    <header>{{localize "lancer.chat-card.title.effect"}}</header>
+    {{{ effect }}}
+  {{/if}}
+</div>
+
